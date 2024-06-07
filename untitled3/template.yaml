@@ -3,6 +3,25 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Single API Gateway with Multiple Lambda Functions
 
+Parameters:
+  AWSACCESSKEYID:
+    Type: String
+    Description: AWS Access Key ID
+  AWSSECRETACCESSKEY:
+      Type: String
+      Description: AWS Secret Access Key
+  SONARTOKEN:
+      Type: String
+      Description: SonarCloud Token
+  DBHOST:
+    Type: String
+  DBUSER:
+      Type: String
+  DBPASSWORD:
+      Type: String
+  DBDATABASE:
+      Type: String
+
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
@@ -160,22 +179,44 @@ Resources:
             RestApiId: !Ref ApiUser
             Path: /user/put
             Method: put
-                  
+
   GitHubActions:
+
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: github_actions/
+      CodeUri: github-actions/
       Handler: app.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.11
       Architectures:
         - x86_64
       Policies:
         - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
-          AWS_ACCESS_KEY_ID: !Ref AWS_ACCESS_KEY_ID
-          AWS_SECRET_ACCESS_KEY: !Ref AWS_SECRET_ACCESS_KEY
-          SONAR_TOKEN: !Ref SONAR_TOKEN
+          AWSACCESSKEYID: !Ref AWSACCESSKEYID
+          AWSSECRETACCESSKEY: !Ref AWSSECRETACCESSKEY
+          SONARTOKEN: !Ref SONARTOKEN
+
+  ReadUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_user/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Architectures:
+        - x86_64
+      Events:
+        GetUser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: get
+      Environment:
+        Variables:
+          DB_HOST: !Ref DBHOST
+          DB_USER: !Ref DBUSER
+          DB_PASSWORD: !Ref DBPASSWORD
+          DB_DATABASE: !Ref DBDATABASE
 
 
 

@@ -17,11 +17,12 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
-stack_name = "BackEndIntegradora"
-s3_prefix = "BackEndIntegradora"
+stack_name = "BackEndFinal"
+s3_prefix = "BackEndFinal"
 region = "us-east-1"
 disable_rollback = true
 image_repositories = []
+parameter_overrides = "AWSACCESSKEYID=\"AKIA5FTY6VEQYPHUIEIQ\" AWSSECRETACCESSKEY=\"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\" SONARTOKEN=\"dabe0db4eb62f122b440d63fb622c91eb7f9b3a5\" DBHOST=\"databaseintegradora.cn8kyuice19b.us-east-1.rds.amazonaws.com\" DBUSER=\"admin\" DBPASSWORD=\"admin123\" DBDATABASE=\"personas_db\""
 
 [default.package.parameters]
 resolve_s3 = true

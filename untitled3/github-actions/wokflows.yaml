@@ -1,0 +1,31 @@
+name: Deploy and Analyze
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Añade aquí los pasos para desplegar tu infraestructura en AWS
+
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          githubToken: ${{ secrets.GITHUBTOKEN }}
+          sonarToken: ${{ secrets.SONARTOKEN }}
+          awsAccessKeyId: ${{ secrets.AWSACCESSKEYID }}
+          awsSecretAccesskey: ${{ secrets.AWSSECRETACCESSKEY }}

@@ -1,2 +1,1 @@
-requests
-pymysql
+mysql-connector-python==8.0.25

@@ -1,43 +1,68 @@
-
 import json
+import os
+import mysql.connector
 
 
 def lambda_handler(event, context):
-    """Sample pure Lambda function
+    # Obtener variables de entorno
+    db_host = os.environ['DBHOST']
+    db_user = os.environ['DBUSER']
+    db_password = os.environ['DBPASSWORD']
+    db_name = os.environ['DBDATABASE']
 
-    Parameters
-    ----------
-    event: dict, required
-        API Gateway Lambda Proxy Input Format
+    # Conexión a la base de datos
+    try:
+        connection = mysql.connector.connect(
+            host=db_host,
+            user=db_user,
+            password=db_password,
+            database=db_name
+        )
 
-        Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
+        cursor = connection.cursor()
 
-    context: object, required
-        Lambda Context runtime methods and attributes
+        sql = "SELECT * FROM personas"
+        cursor.execute(sql)
+        users = cursor.fetchall()
 
-        Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+        if users:
+            user_list = []
+            for user in users:
+                user_dict = {
+                    'id': user[0],
+                    'nombre': user[1],
+                    'apellido': user[2],
+                    'edad': user[3]
+                }
+                user_list.append(user_dict)
 
-    Returns
-    ------
-    API Gateway Lambda Proxy Output Format: dict
-
-        Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-    """
-
-    # try:
-    #     ip = requests.get("http://checkip.amazonaws.com/")
-    # except requests.RequestException as e:
-    #     # Send some context about this error to Lambda Logs
-    #     print(e)
-
-    #     raise e
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps(
-            {
-                "message": "hello world",
-                # "location": ip.text.replace("\n", "")
+            return {
+                'statusCode': 200,
+                'body': json.dumps(user_list),
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }
             }
-        ),
-    }
+        else:
+            return {
+                'statusCode': 404,
+                'body': json.dumps({'message': 'No users found'}),
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }
+            }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)}),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        }
+    finally:
+        if 'connection' in locals():
+            cursor.close()
+            connection.close()
